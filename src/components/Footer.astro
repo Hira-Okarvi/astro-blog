@@ -1,5 +1,5 @@
 ---
-import Hr from "./Hr.astro";
+import { SITE } from "@config";
 import Socials from "./Socials.astro";
 
 const currentYear = new Date().getFullYear();
@@ -11,35 +11,105 @@ export interface Props {
 const { noMarginTop = false } = Astro.props;
 ---
 
-<footer class={`${noMarginTop ? "" : "mt-auto"}`}>
-  <Hr noPadding />
-  <div class="footer-wrapper">
-    <Socials centered />
-    <div class="copyright-wrapper">
-      <span>Copyright &#169; {currentYear}</span>
-      <span class="separator">&nbsp;|&nbsp;</span>
-      <span>All rights reserved.</span>
+<footer class={`site-footer ${noMarginTop ? "" : "mt-auto"}`}>
+  <div class="footer-inner footer-top">
+    <a href="/" class="footer-brand">
+      <span>{SITE.title}</span>
+      <small>Web Designer &amp; Developer</small>
+    </a>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href="/">Home</a>
+      <a href="/about/">About</a>
+      <a href="/posts/">Posts</a>
+      <a href="/tags/">Tags</a>
+    </nav>
+    <div class="footer-socials">
+      <Socials centered />
     </div>
+  </div>
+  <div class="footer-inner footer-bottom">
+    <span>WordPress · Elementor · WooCommerce · ACF</span>
+    <span>© {currentYear} {SITE.title}. All Rights Reserved.</span>
   </div>
 </footer>
 
 <style>
-  footer {
-    @apply w-full;
+  .site-footer {
+    width: 100%;
+    max-width: 100%;
+    background: #151515;
+    color: #fff;
+    padding: 42px 0 20px;
+    margin: 0;
   }
-  .footer-wrapper {
-    @apply flex flex-col items-center justify-between py-6 sm:flex-row-reverse sm:py-4;
+  .footer-inner {
+    width: min(1180px, calc(100% - 48px));
+    margin: auto;
   }
-  .link-button {
-    @apply my-1 p-2 hover:rotate-6;
+  .footer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    flex-wrap: wrap;
   }
-  .link-button svg {
-    @apply scale-125;
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
   }
-  .copyright-wrapper {
-    @apply my-2 flex flex-col items-center whitespace-nowrap sm:flex-row;
+  .footer-brand span {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 25px;
+    font-weight: 500;
+    color: #fff;
   }
-  .separator {
-    @apply hidden sm:inline;
+  .footer-brand small {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 5px;
+  }
+  .footer-nav {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .footer-nav a {
+    font-size: 11px;
+    color: #bbb;
+  }
+  .footer-nav a:hover {
+    color: #fff;
+  }
+  .footer-socials :global(svg) {
+    fill: #ddd;
+  }
+  .footer-socials :global(svg:hover) {
+    fill: #fff;
+  }
+  .footer-bottom {
+    border-top: 1px solid #333;
+    margin-top: 28px;
+    padding-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    color: #777;
+    font-size: 10px;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 800px) {
+    .footer-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .footer-nav {
+      justify-content: flex-start;
+    }
+    .footer-bottom {
+      flex-direction: column;
+    }
   }
 </style>

@@ -23,6 +23,11 @@ const blog = defineCollection({
     }),
 });
 
+const statItem = z.object({
+  value: z.string(),
+  label: z.string().default(""),
+});
+
 const home = defineCollection({
   type: "content",
   schema: z.object({
@@ -32,8 +37,40 @@ const home = defineCollection({
     profileImage: z.string().optional(),
     email: z.string().optional(),
     location: z.string().optional(),
+    aboutTitle: z.string().default(""),
+    aboutText: z.string().default(""),
     skills: z.array(z.string()).default([]),
-    ctaText: z.string().default("View My Work"),
+    stats: z.array(statItem).default([]),
+    highlights: z.array(statItem).default([]),
+    services: z
+      .array(
+        z.object({
+          icon: z.string().default(""),
+          title: z.string(),
+          description: z.string().default(""),
+        })
+      )
+      .default([]),
+    projects: z
+      .array(
+        z.object({
+          title: z.string(),
+          stack: z.string().default(""),
+          category: z.string().default(""),
+        })
+      )
+      .default([]),
+    experience: z
+      .array(
+        z.object({
+          time: z.string().default(""),
+          title: z.string(),
+          description: z.string().default(""),
+        })
+      )
+      .default([]),
+    ctaText: z.string().default("Let's Work Together"),
+    ctaSub: z.string().default(""),
     ctaLink: z.string().default("/posts"),
   }),
 });

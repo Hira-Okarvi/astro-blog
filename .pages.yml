@@ -31,9 +31,17 @@ content:
       - { name: profileImage, label: Profile Image, type: image }
       - { name: email, label: Email, type: string }
       - { name: location, label: Location, type: string }
+      - { name: stats, label: Hero Stats, type: object, list: true, fields: [ { name: value, label: Value, type: string }, { name: label, label: Label, type: string } ] }
+      - { name: aboutTitle, label: About Title, type: string }
+      - { name: aboutText, label: About Text, type: text }
+      - { name: highlights, label: Experience Highlights, type: object, list: true, fields: [ { name: value, label: Value, type: string }, { name: label, label: Label, type: string } ] }
+      - { name: services, label: Services, type: object, list: true, fields: [ { name: icon, label: Icon, type: string }, { name: title, label: Title, type: string }, { name: description, label: Description, type: text } ] }
+      - { name: projects, label: Projects, type: object, list: true, fields: [ { name: title, label: Title, type: string }, { name: stack, label: Tech Stack, type: string }, { name: category, label: Category, type: string } ] }
+      - { name: experience, label: Experience Timeline, type: object, list: true, fields: [ { name: time, label: Period, type: string }, { name: title, label: Title, type: string }, { name: description, label: Description, type: text } ] }
       - { name: skills, label: Skills, type: string, list: true }
-      - { name: ctaText, label: Button Text, type: string }
-      - { name: ctaLink, label: Button Link, type: string }
+      - { name: ctaText, label: CTA Heading, type: string }
+      - { name: ctaSub, label: CTA Sub-text, type: text }
+      - { name: ctaLink, label: CTA Button Link, type: string }
       - { name: body, label: Body, type: rich-text, options: { input: public/assets, output: /assets } }
   - name: about
     label: About page

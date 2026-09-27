@@ -1,102 +1,112 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import LinkButton from "@components/LinkButton.astro";
 import Hr from "@components/Hr.astro";
 import Card from "@components/Card";
 import Socials from "@components/Socials.astro";
 import getSortedPosts from "@utils/getSortedPosts";
-import { SOCIALS } from "@config";
+import { SITE, SOCIALS } from "@config";
 
 const posts = await getCollection("blog");
 
 const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
+const home = (await getEntry("home", "index"))?.data ?? {
+  name: SITE.author,
+  role: "",
+  intro: SITE.desc,
+  profileImage: "/assets/profile.svg",
+  email: "",
+  location: "",
+  skills: [],
+  ctaText: "View My Work",
+  ctaLink: "/posts",
+};
+
 const socialCount = SOCIALS.filter(social => social.active).length;
+const marqueeItems = [...home.skills, home.role].filter(Boolean);
 ---
 
 <Layout>
   <Header />
   <main id="main-content">
     <section id="hero">
-      <h1>Mingalaba</h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="rss-link"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-          ><path
-            d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-          ></path><path
-            d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-          ></path><circle cx="6" cy="18" r="2"></circle>
-        </svg>
-        <span class="sr-only">RSS Feed</span>
-      </a>
-
-      <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
-      </p>
-      <p>
-        Read the blog posts or check
-        <LinkButton
-          className="underline decoration-dashed underline-offset-4 hover:text-skin-accent"
-          href="https://github.com/satnaing/astro-paper#readme"
-        >
-          README
-        </LinkButton> for more info.
-      </p>
-      {
-        // only display if at least one social link is enabled
-        socialCount > 0 && (
-          <div class="social-wrapper">
-            <div class="social-links">Social Links:</div>
-            <Socials />
+      <div class="hero-grid">
+        <div class="hero-copy">
+          {
+            home.location && (
+              <p class="hero-kicker anim" style="--d:0ms">
+                ✳ {home.location} — Portfolio
+              </p>
+            )
+          }
+          <h1 class="anim" style="--d:100ms">{home.name}</h1>
+          {home.role && (
+            <p class="hero-role anim" style="--d:200ms">{home.role}</p>
+          )}
+          {home.intro && (
+            <p class="hero-intro anim" style="--d:300ms">{home.intro}</p>
+          )}
+          <div class="hero-cta anim" style="--d:400ms">
+            <a href={home.ctaLink} class="btn-solid">{home.ctaText}</a>
+            {
+              home.email && (
+                <a href={`mailto:${home.email}`} class="btn-outline">
+                  Get in Touch
+                </a>
+              )
+            }
           </div>
-        )
-      }
+          {
+            socialCount > 0 && (
+              <div class="hero-socials anim" style="--d:500ms">
+                <Socials />
+              </div>
+            )
+          }
+        </div>
+        <div class="hero-photo anim" style="--d:250ms">
+          <img
+            src={home.profileImage}
+            alt={`Portrait of ${home.name}`}
+            width="400"
+            height="480"
+            loading="eager"
+          />
+          <span class="frame" aria-hidden="true"></span>
+        </div>
+      </div>
     </section>
 
-    <Hr />
-
     {
-      featuredPosts.length > 0 && (
-        <>
-          <section id="featured">
-            <h2>Featured</h2>
-            <ul>
-              {featuredPosts.map(({ data, slug }) => (
-                <Card
-                  href={`/posts/${slug}/`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
-            </ul>
-          </section>
-          {recentPosts.length > 0 && <Hr />}
-        </>
+      marqueeItems.length > 0 && (
+        <div class="marquee" aria-hidden="true">
+          <div class="marquee-track">
+            {[0, 1].map(() =>
+              marqueeItems.map(item => (
+                <span class="marquee-item">
+                  {item} <i>✦</i>
+                </span>
+              ))
+            )}
+          </div>
+        </div>
       )
     }
 
     {
       recentPosts.length > 0 && (
         <section id="recent-posts">
-          <h2>Recent Posts</h2>
+          <h2 class="anim-heading">
+            <span class="heading-index">01</span> Latest Writing
+          </h2>
           <ul>
             {recentPosts.map(
               ({ data, slug }, index) =>
-                index < 4 && (
+                index < 3 && (
                   <Card
                     href={`/posts/${slug}/`}
                     frontmatter={data}
@@ -105,59 +115,174 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                 )
             )}
           </ul>
+          <div class="all-posts-btn-wrapper">
+            <a href="/posts/" class="btn-outline">
+              All Posts
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                ><path
+                  d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+                ></path>
+              </svg>
+            </a>
+          </div>
         </section>
       )
     }
 
-    <div class="all-posts-btn-wrapper">
-      <LinkButton href="/posts/">
-        All Posts
-        <svg xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-          ></path>
-        </svg>
-      </LinkButton>
-    </div>
+    <Hr />
+
+    <section id="contact-cta">
+      <h2 class="anim-heading">
+        <span class="heading-index">02</span> Let's Work Together
+      </h2>
+      <p>
+        Have a project in mind or just want to say hello? My inbox is always
+        open.
+      </p>
+      {
+        home.email && (
+          <a href={`mailto:${home.email}`} class="contact-email">
+            {home.email}
+          </a>
+        )
+      }
+    </section>
   </main>
 
   <Footer />
 </Layout>
 
 <style>
-  /* ===== Hero Section ===== */
-  #hero {
-    @apply pb-6 pt-8;
+  /* ===== Entrance animation ===== */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  #hero h1 {
-    @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
+  .anim,
+  .anim-heading {
+    opacity: 0;
+    animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--d, 0ms);
   }
-  #hero .rss-link {
-    @apply mb-6;
-  }
-  #hero .rss-icon {
-    @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-  }
-  #hero p {
-    @apply my-2;
-  }
-  .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
-  }
-  .social-links {
-    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
+  @media (prefers-reduced-motion: reduce) {
+    .anim,
+    .anim-heading,
+    .marquee-track {
+      animation: none !important;
+      opacity: 1 !important;
+    }
   }
 
-  /* ===== Featured & Recent Posts Sections ===== */
-  #featured,
-  #recent-posts {
-    @apply pb-6 pt-12;
+  /* ===== Hero ===== */
+  #hero {
+    @apply pb-10 pt-10 sm:pt-16;
   }
-  #featured h2,
-  #recent-posts h2 {
-    @apply text-2xl font-semibold tracking-wide;
+  .hero-grid {
+    @apply grid items-center gap-10 sm:grid-cols-[1.2fr_1fr];
+  }
+  .hero-kicker {
+    @apply font-mono text-xs uppercase tracking-[0.3em] text-skin-accent;
+  }
+  #hero h1 {
+    @apply mt-3 font-serif text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-7xl;
+  }
+  .hero-role {
+    @apply mt-3 font-serif text-xl italic text-skin-accent sm:text-2xl;
+  }
+  .hero-intro {
+    @apply mt-5 max-w-xl text-base leading-relaxed opacity-90;
+  }
+  .hero-cta {
+    @apply mt-8 flex flex-wrap gap-4;
+  }
+  .btn-solid {
+    @apply inline-flex items-center gap-2 border-2 border-skin-fill bg-skin-inverted
+      px-6 py-3 text-sm font-semibold uppercase tracking-wider text-skin-inverted
+      transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-lg;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-2 border-2 border-skin-fill px-6 py-3
+      text-sm font-semibold uppercase tracking-wider transition-all
+      duration-300 hover:-translate-y-0.5 hover:bg-skin-inverted hover:text-skin-inverted;
+  }
+  .btn-outline svg {
+    @apply h-4 w-4 fill-current;
+  }
+  .hero-socials {
+    @apply mt-8;
+  }
+
+  .hero-photo {
+    @apply relative mx-auto w-4/5 max-w-xs sm:w-full sm:max-w-none;
+  }
+  .hero-photo img {
+    @apply relative z-10 w-full border-2 border-skin-fill object-cover;
+    filter: grayscale(1) contrast(1.08);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
+  }
+  .hero-photo:hover img {
+    transform: translate(-6px, -6px);
+    filter: grayscale(1) contrast(1.15);
+  }
+  .hero-photo .frame {
+    @apply absolute inset-0 z-0 translate-x-4 translate-y-4 border-2 border-skin-fill;
+  }
+
+  /* ===== Marquee ===== */
+  .marquee {
+    @apply overflow-hidden border-y-2 border-skin-line py-3;
+  }
+  .marquee-track {
+    @apply flex w-max whitespace-nowrap;
+    animation: marquee 26s linear infinite;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee-item {
+    @apply mx-6 font-serif text-lg italic;
+  }
+  .marquee-item i {
+    @apply not-italic text-skin-accent;
+  }
+
+  /* ===== Sections ===== */
+  #recent-posts,
+  #contact-cta {
+    @apply pb-6 pt-14;
+  }
+  .anim-heading {
+    @apply font-serif text-3xl font-bold tracking-tight sm:text-4xl;
+    --d: 0ms;
+  }
+  .heading-index {
+    @apply mr-3 font-mono text-sm font-medium tracking-widest text-skin-accent align-top;
+  }
+  #recent-posts ul {
+    @apply mt-6;
   }
   .all-posts-btn-wrapper {
     @apply my-8 text-center;
+  }
+
+  /* ===== Contact CTA ===== */
+  #contact-cta {
+    @apply pb-16 text-center;
+  }
+  #contact-cta p {
+    @apply mx-auto mt-4 max-w-md opacity-90;
+  }
+  .contact-email {
+    @apply mt-6 inline-block font-serif text-2xl italic underline
+      decoration-1 underline-offset-8 transition-colors duration-300
+      hover:text-skin-accent sm:text-3xl;
   }
 </style>

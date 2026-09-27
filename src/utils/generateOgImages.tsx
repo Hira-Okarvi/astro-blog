@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import satori, { type SatoriOptions } from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import { type CollectionEntry } from "astro:content";
@@ -5,17 +7,13 @@ import postOgImage from "./og-templates/post";
 import siteOgImage from "./og-templates/site";
 
 const fetchFonts = async () => {
-  // Regular Font
-  const fontFileRegular = await fetch(
-    "https://www.1001fonts.com/download/font/ibm-plex-mono.regular.ttf"
+  // Fonts are bundled locally so the build never depends on external fetch.
+  const fontRegular = await readFile(
+    join(process.cwd(), "src/assets/fonts/IBMPlexMono-Regular.woff")
   );
-  const fontRegular: ArrayBuffer = await fontFileRegular.arrayBuffer();
-
-  // Bold Font
-  const fontFileBold = await fetch(
-    "https://www.1001fonts.com/download/font/ibm-plex-mono.bold.ttf"
+  const fontBold = await readFile(
+    join(process.cwd(), "src/assets/fonts/IBMPlexMono-Bold.woff")
   );
-  const fontBold: ArrayBuffer = await fontFileBold.arrayBuffer();
 
   return { fontRegular, fontBold };
 };

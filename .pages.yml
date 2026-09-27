@@ -20,6 +20,21 @@ content:
       - { name: tags, label: Tags, type: string, list: true }
       - { name: description, label: Description, type: string }
       - { name: body, label: Body, type: rich-text }
+  - name: home
+    label: Home page
+    type: file
+    path: src/content/home/index.md
+    fields:
+      - { name: name, label: Name, type: string, required: true }
+      - { name: role, label: Role / Tagline, type: string }
+      - { name: intro, label: Intro, type: text }
+      - { name: profileImage, label: Profile Image, type: image }
+      - { name: email, label: Email, type: string }
+      - { name: location, label: Location, type: string }
+      - { name: skills, label: Skills, type: string, list: true }
+      - { name: ctaText, label: Button Text, type: string }
+      - { name: ctaLink, label: Button Link, type: string }
+      - { name: body, label: Body, type: rich-text, options: { input: public/assets, output: /assets } }
   - name: about
     label: About page
     type: file

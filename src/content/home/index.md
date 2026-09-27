@@ -4,7 +4,7 @@ role: WordPress Web Designer & Developer
 intro: >-
   I design and develop modern, responsive WordPress websites and eCommerce
   experiences that look great, work smoothly, and support real business goals.
-profileImage: /assets/profile.svg
+profileImage: /assets/hira.png
 email: hirajalandri246@gmail.com
 location: Pakistan
 aboutTitle: Turning Ideas Into Functional Websites

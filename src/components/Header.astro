@@ -3,7 +3,7 @@ import { LOGO_IMAGE, SITE, SOCIALS } from "@config";
 import LinkButton from "./LinkButton.astro";
 
 export interface Props {
-  activeNav?: "posts" | "tags" | "about" | "search";
+  activeNav?: "posts" | "tags" | "about" | "search" | "work";
 }
 
 const { activeNav } = Astro.props;
@@ -66,6 +66,11 @@ const mailto = SOCIALS.find(s => s.name === "Mail" && s.active)?.href;
         <li>
           <a href="/posts/" class={activeNav === "posts" ? "active" : ""}>
             Posts
+          </a>
+        </li>
+        <li>
+          <a href="/case-studies/" class={activeNav === "work" ? "active" : ""}>
+            Work
           </a>
         </li>
         <li>

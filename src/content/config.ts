@@ -75,4 +75,34 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { blog, home };
+const caseCategories = defineCollection({
+  type: "content",
+  schema: z.object({
+    name: z.string(),
+    description: z.string().default(""),
+  }),
+});
+
+const caseStudies = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    tagline: z.string().default(""),
+    description: z.string().default(""),
+    category: z.string().default(""),
+    industry: z.string().default(""),
+    technologies: z.array(z.string()).default([]),
+    location: z.string().default(""),
+    country: z.string().default(""),
+    pubDatetime: z.date().optional(),
+    draft: z.boolean().optional(),
+    featuredImage: z.string().optional(),
+    overview: z.string().default(""),
+    challenges: z.string().default(""),
+    deliverables: z.array(z.string()).default([]),
+    conclusion: z.string().default(""),
+    gallery: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { blog, home, caseCategories, caseStudies };

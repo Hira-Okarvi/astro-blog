@@ -1,9 +1,15 @@
 ---
-import { getEntry } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
+import CaseStudyCard from "@components/CaseStudyCard.astro";
+import getSortedCaseStudies from "@utils/getSortedCaseStudies";
 import { SITE } from "@config";
+
+const latestCaseStudies = getSortedCaseStudies(
+  await getCollection("caseStudies")
+).slice(0, 4);
 
 const home = (await getEntry("home", "index"))?.data ?? {
   name: SITE.author,
@@ -215,6 +221,27 @@ const aboutParagraphs = home.aboutText.split(/\n\s*\n/).filter(Boolean);
                   <p>{e.description}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <!-- ===== Case Studies ===== -->
+    {
+      latestCaseStudies.length > 0 && (
+        <section class="section case-studies" id="case-studies">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Case Studies</p>
+                <h2>Featured Projects</h2>
+                <p>Real projects, real challenges, real results.</p>
+              </div>
+              <a href="/case-studies/" class="text-link">View All →</a>
+            </div>
+            <div class="cs-grid">
+              {latestCaseStudies.map(cs => <CaseStudyCard caseStudy={cs} />)}
             </div>
           </div>
         </section>
@@ -750,6 +777,16 @@ const aboutParagraphs = home.aboutText.split(/\n\s*\n/).filter(Boolean);
     font-weight: 600;
   }
 
+  /* ===== Case Studies ===== */
+  .case-studies {
+    background: rgb(var(--color-fill));
+  }
+  .cs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+
   /* ===== Experience ===== */
   .experience {
     background: rgb(var(--color-card));
@@ -901,6 +938,9 @@ const aboutParagraphs = home.aboutText.split(/\n\s*\n/).filter(Boolean);
     }
     .project-grid {
       grid-template-columns: 1fr 1fr;
+    }
+    .cs-grid {
+      grid-template-columns: 1fr;
     }
     .cta-box {
       padding: 40px 30px;

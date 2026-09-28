@@ -1,0 +1,386 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import getSortedCaseStudies from "@utils/getSortedCaseStudies";
+import { slugifyStr } from "@utils/slugify";
+import { SITE } from "@config";
+
+export interface Props {
+  entry: CollectionEntry<"caseStudies">;
+}
+
+export async function getStaticPaths() {
+  const entries = await getCollection("caseStudies", ({ data }) => !data.draft);
+  return entries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const {
+  title,
+  tagline,
+  description,
+  category,
+  industry,
+  technologies,
+  location,
+  country,
+  pubDatetime,
+  featuredImage,
+  overview,
+  challenges,
+  deliverables,
+  conclusion,
+  gallery,
+} = entry.data;
+
+const categories = await getCollection("caseCategories");
+const categoryEntry = categories.find(
+  c => slugifyStr(c.data.name) === slugifyStr(category) || c.slug === category
+);
+
+const metaItems = [
+  { label: "Industry", value: industry },
+  { label: "Technologies", value: technologies.join(", ") },
+  { label: "Location", value: location },
+  { label: "Country", value: country },
+  {
+    label: "Category",
+    value: categoryEntry?.data.name ?? category,
+    href: categoryEntry ? `/case-studies/category/${categoryEntry.slug}/` : undefined,
+  },
+].filter(m => m.value);
+
+const paragraphs = (text: string) =>
+  text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+---
+
+<Layout title={`${title} | ${SITE.title}`} description={description || tagline} scrollSmooth>
+  <Header activeNav="work" />
+  <main id="main-content" class="cs-single">
+    <div class="container">
+      <a href="/case-studies/" class="back-link">← All Case Studies</a>
+
+      <header class="cs-hero">
+        {category && <p class="eyebrow">{categoryEntry?.data.name ?? category} — Case Study</p>}
+        <h1>{title}</h1>
+        {tagline && <p class="cs-hero-tagline">{tagline}</p>}
+        {description && <p class="cs-hero-desc">{description}</p>}
+        {
+          pubDatetime && (
+            <p class="cs-date">
+              {pubDatetime.toLocaleDateString("en-US", { year: "numeric", month: "long" })}
+            </p>
+          )
+        }
+      </header>
+
+      {
+        featuredImage && (
+          <div class="cs-feature">
+            <img src={featuredImage} alt={title} />
+          </div>
+        )
+      }
+
+      {
+        metaItems.length > 0 && (
+          <div class="cs-meta">
+            {metaItems.map(m => (
+              <div class="cs-meta-item">
+                <span class="cs-meta-label">{m.label}</span>
+                {m.href ? (
+                  <a href={m.href} class="cs-meta-value cs-meta-link">{m.value}</a>
+                ) : (
+                  <span class="cs-meta-value">{m.value}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        overview && (
+          <section class="cs-block">
+            <h2><span class="num">01</span> Project Overview</h2>
+            {paragraphs(overview).map(p => <p>{p}</p>)}
+          </section>
+        )
+      }
+
+      {
+        challenges && (
+          <section class="cs-block">
+            <h2><span class="num">02</span> Challenges</h2>
+            {paragraphs(challenges).map(p => <p>{p}</p>)}
+          </section>
+        )
+      }
+
+      {
+        deliverables.length > 0 && (
+          <section class="cs-block">
+            <h2><span class="num">03</span> What We Delivered</h2>
+            <div class="cs-deliver">
+              <ul>
+                {deliverables.map(d => <li>{d}</li>)}
+              </ul>
+            </div>
+          </section>
+        )
+      }
+
+      {
+        gallery.length > 0 && (
+          <section class="cs-block">
+            <h2><span class="num">04</span> Gallery</h2>
+            <div class="cs-gallery">
+              {gallery.map((src, i) => (
+                <img src={src} alt={`${title} screenshot ${i + 1}`} loading="lazy" />
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      {
+        conclusion && (
+          <section class="cs-block">
+            <h2><span class="num">05</span> Conclusion</h2>
+            {paragraphs(conclusion).map(p => <p>{p}</p>)}
+          </section>
+        )
+      }
+
+      <article class="cs-body prose">
+        <Content />
+      </article>
+
+      <div class="cs-cta">
+        <h2>Want results like this?</h2>
+        <p>Let's talk about your project.</p>
+        <a href="mailto:hirajalandri246@gmail.com" class="btn-white">Start a Project →</a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .cs-single {
+    padding: 60px 0 100px;
+  }
+  .container {
+    width: min(900px, calc(100% - 48px));
+    margin: auto;
+  }
+  .back-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgb(var(--color-accent));
+    display: inline-block;
+    margin-bottom: 34px;
+  }
+  .back-link:hover {
+    color: rgb(var(--color-text-base));
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: rgb(var(--color-accent));
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .cs-hero h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(38px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    font-weight: 700;
+  }
+  .cs-hero-tagline {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 22px;
+    color: rgb(var(--color-accent));
+    margin-top: 10px;
+  }
+  .cs-hero-desc {
+    color: rgb(var(--color-accent));
+    margin-top: 14px;
+    max-width: 640px;
+    line-height: 1.7;
+  }
+  .cs-date {
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: rgb(var(--color-accent));
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+  .cs-feature {
+    margin-top: 40px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgb(var(--color-border));
+  }
+  .cs-feature img {
+    width: 100%;
+    display: block;
+    filter: grayscale(1) contrast(1.05);
+  }
+  .cs-meta {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: rgb(var(--color-border));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .cs-meta-item {
+    background: rgb(var(--color-card));
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .cs-meta-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: rgb(var(--color-accent));
+    text-transform: uppercase;
+  }
+  .cs-meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(var(--color-text-base));
+  }
+  .cs-meta-link {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .cs-block {
+    margin-top: 54px;
+  }
+  .cs-block h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .cs-block h2 .num {
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgb(var(--color-accent));
+    vertical-align: top;
+    margin-right: 10px;
+  }
+  .cs-block p {
+    color: rgb(var(--color-accent));
+    line-height: 1.75;
+    margin-bottom: 12px;
+    max-width: 680px;
+  }
+  .cs-deliver {
+    background: rgb(var(--color-card));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 16px;
+    padding: 24px 27px;
+  }
+  .cs-deliver ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    list-style: none;
+    font-size: 13px;
+    color: rgb(var(--color-accent));
+  }
+  .cs-deliver li::before {
+    content: "✓";
+    color: rgb(var(--color-text-base));
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .cs-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .cs-gallery img {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgb(var(--color-border));
+    filter: grayscale(1) contrast(1.05);
+  }
+  .cs-body {
+    margin-top: 54px;
+  }
+  .cs-cta {
+    margin-top: 70px;
+    background: #171717;
+    color: #fff;
+    border-radius: 24px;
+    padding: 48px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cs-cta::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    right: -70px;
+    top: -110px;
+  }
+  .cs-cta h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 30px;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+  .cs-cta p {
+    color: #bdbdbd;
+    margin-bottom: 24px;
+  }
+  .btn-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 14px 21px;
+    background: #fff;
+    color: #171717;
+    position: relative;
+    z-index: 2;
+    transition: 0.25s;
+  }
+  .btn-white:hover {
+    background: #eee;
+  }
+  @media (max-width: 640px) {
+    .cs-deliver ul,
+    .cs-gallery {
+      grid-template-columns: 1fr;
+    }
+    .cs-cta {
+      padding: 36px 26px;
+    }
+  }
+</style>

@@ -1,0 +1,133 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import CaseStudyCard from "@components/CaseStudyCard.astro";
+import getSortedCaseStudies from "@utils/getSortedCaseStudies";
+import { SITE } from "@config";
+
+const entries = await getCollection("caseStudies");
+const caseStudies = getSortedCaseStudies(entries);
+const categories = (await getCollection("caseCategories")).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name)
+);
+
+const pageProps = {
+  title: `Case Studies | ${SITE.title}`,
+  description: "Selected project case studies — design, challenges and results.",
+};
+---
+
+<Layout {...pageProps}>
+  <Header activeNav="work" />
+  <main id="main-content" class="cs-page">
+    <div class="container">
+      <p class="eyebrow">Case Studies</p>
+      <div class="cs-head">
+        <h1>Work That <span>Speaks</span></h1>
+        <p>Real projects, real challenges, real results.</p>
+      </div>
+
+      {
+        categories.length > 0 && (
+          <div class="cs-filters">
+            <a class="filter active" href="/case-studies/">All</a>
+            {categories.map(c => (
+              <a class="filter" href={`/case-studies/category/${c.slug}/`}>
+                {c.data.name}
+              </a>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        caseStudies.length > 0 ? (
+          <div class="cs-grid">
+            {caseStudies.map(cs => <CaseStudyCard caseStudy={cs} />)}
+          </div>
+        ) : (
+          <p class="cs-empty">No case studies yet — check back soon.</p>
+        )
+      }
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .cs-page {
+    padding: 70px 0 100px;
+  }
+  .container {
+    width: min(1180px, calc(100% - 48px));
+    margin: auto;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: rgb(var(--color-accent));
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .cs-head h1 {
+    font-size: 42px;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    font-weight: 700;
+  }
+  .cs-head h1 span {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-weight: 500;
+  }
+  .cs-head p {
+    color: rgb(var(--color-accent));
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .cs-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 28px 0 34px;
+  }
+  .filter {
+    border: 1px solid rgb(var(--color-border));
+    background: rgb(var(--color-fill));
+    border-radius: 20px;
+    padding: 8px 13px;
+    font-size: 11px;
+    color: rgb(var(--color-accent));
+  }
+  .filter.active,
+  .filter:hover {
+    background: rgb(var(--color-text-base));
+    color: rgb(var(--color-fill));
+    border-color: rgb(var(--color-text-base));
+  }
+  .cs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .cs-empty {
+    color: rgb(var(--color-accent));
+    padding: 40px 0;
+  }
+  @media (max-width: 1050px) {
+    .cs-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 600px) {
+    .cs-grid {
+      grid-template-columns: 1fr;
+    }
+    .cs-head h1 {
+      font-size: 32px;
+    }
+  }
+</style>

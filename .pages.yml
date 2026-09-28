@@ -20,6 +20,39 @@ content:
       - { name: tags, label: Tags, type: string, list: true }
       - { name: description, label: Description, type: string }
       - { name: body, label: Body, type: rich-text }
+  - name: case-categories
+    label: Case Study Categories
+    type: collection
+    path: src/content/caseCategories
+    view:
+      fields: [ name ]
+    fields:
+      - { name: name, label: Category Name, type: string, required: true }
+      - { name: description, label: Description, type: text }
+  - name: case-studies
+    label: Case Studies
+    type: collection
+    path: src/content/caseStudies
+    view:
+      fields: [ title, category, pubDatetime ]
+    fields:
+      - { name: title, label: Project Name, type: string, required: true }
+      - { name: tagline, label: Tagline, type: string }
+      - { name: description, label: Short Description, type: text }
+      - { name: category, label: Category, type: reference, options: { collection: case-categories, value: "{name}", label: "{name}", search: name } }
+      - { name: industry, label: Industry, type: string }
+      - { name: technologies, label: Technologies, type: string, list: true }
+      - { name: location, label: City / Location, type: string }
+      - { name: country, label: Country, type: string }
+      - { name: pubDatetime, label: Date, type: date }
+      - { name: draft, label: Draft, type: boolean }
+      - { name: featuredImage, label: Featured Image, type: image }
+      - { name: overview, label: Project Overview, type: text }
+      - { name: challenges, label: Challenges, type: text }
+      - { name: deliverables, label: What We Delivered, type: string, list: true }
+      - { name: conclusion, label: Conclusion, type: text }
+      - { name: gallery, label: Project Gallery, type: image, list: true }
+      - { name: body, label: Extra Content, type: rich-text, options: { input: public/assets, output: /assets } }
   - name: home
     label: Home page
     type: file
